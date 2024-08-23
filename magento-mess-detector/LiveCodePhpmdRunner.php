@@ -59,7 +59,7 @@ class LiveCodePhpmdRunner implements ToolInterface
         $commandLineArguments = [
             'run_file_mock', //emulate script name in console arguments
             $this->getSourceCodePath($whiteList),
-            'github', //report format
+	    'ansi', //report format
             $this->rulesetFile,
             '--reportfile',
             $this->reportFile,
@@ -67,7 +67,7 @@ class LiveCodePhpmdRunner implements ToolInterface
             'php',
             '--exclude',
             'vendor/,tmp/,var/,generated/,.git/,.idea/'
-        ];
+	];
 
         $options = new \PHPMD\TextUI\CommandLineOptions($commandLineArguments);
 
@@ -75,12 +75,14 @@ class LiveCodePhpmdRunner implements ToolInterface
 
         return $command->run($options, new \PHPMD\RuleSetFactory());
     }
-
-    private function getSourceCodePath($whiteList): string
+    private function getSourceCodePath($whiteList)
     {
         if (!empty($whiteList)) {
+            $whiteList = array_map(function($gitHubWorkspace){
+                             return $_SERVER['GITHUB_WORKSPACE'] . '/' . $gitHubWorkspace;
+	    }, $whiteList);
             return implode(',', $whiteList);
         }
-        return $_SERVER['GITHUB_WORKSPACE'] ?: '/var/www/html';
+	return $_SERVER['GITHUB_WORKSPACE'] ?: '/app/code/RetaiLogists';
     }
 }

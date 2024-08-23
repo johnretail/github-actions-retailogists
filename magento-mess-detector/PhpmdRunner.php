@@ -50,9 +50,17 @@ class PhpmdRunner extends \PHPUnit\Framework\TestCase
 
         if (!$codeMessDetector->canRun()) {
             $this->markTestSkipped('PHP Mess Detector is not available.');
-        }
+	}
 
-        $result = $codeMessDetector->run([]);
+	$filesChanged = $_SERVER['GITHUB_WORKSPACE'] . '/fileschanged.txt';
+        $outputFileChanged = "";
+        if (file_exists($filesChanged)) {
+	    $outputFileChanged = file_get_contents($filesChanged);
+            $outputFileChanged = explode(' ',$outputFileChanged);
+	}
+	echo "File Changed: " . print_r($outputFileChanged);
+
+        $result = $codeMessDetector->run($outputFileChanged);
 
         $output = "";
         if (file_exists($reportFile)) {
